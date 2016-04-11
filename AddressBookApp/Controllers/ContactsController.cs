@@ -5,6 +5,8 @@ using System.Web.Mvc;
 using AddressBookApp.Data.Context;
 using AddressBookApp.ViewModels;
 using AddressBookApp.Data.Interfaces;
+using DataTables.Mvc;
+using AddressBookApp.Helpers;
 
 namespace AddressBookApp.Controllers
 {
@@ -16,6 +18,37 @@ namespace AddressBookApp.Controllers
         public ContactsController(IPersonRepository personRepository)
         {
             _personRepository = personRepository;
+        }
+
+        public JsonResult GetFilteredContacts([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dataTablesRequestModel)
+        {
+            int filteredCount;
+            int totalCount;
+
+            var sortedColumns = dataTablesRequestModel.Columns.GetSortedColumns();
+            var sortingConfig = DataTablesHelper.GetSortingConfig(sortedColumns);
+
+            var filteredResults = _personRepository.GetFilteredList(dataTablesRequestModel.Search.Value,
+                                                                    dataTablesRequestModel.Start,
+                                                                    dataTablesRequestModel.Length,
+                                                                    sortingConfig,
+                                                                    out filteredCount,
+                                                                    out totalCount);                 
+
+            var data = filteredResults.Select(contact => new ContactListItemViewModel
+            {
+                Id = contact.Id,
+                Name = contact.Name,
+                Surname = contact.Surname              
+            });                     
+
+            return Json(new DataTablesResponse
+            (
+                dataTablesRequestModel.Draw,
+                data,
+                filteredCount,
+                totalCount
+            ), JsonRequestBehavior.AllowGet);
         }
 
         // GET: People

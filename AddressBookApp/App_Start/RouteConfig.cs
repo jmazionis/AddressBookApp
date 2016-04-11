@@ -21,9 +21,9 @@ namespace AddressBookApp
 
             routes.MapRoute(
                 name: "EmailsCreate",
-                url: "Contacts/{id}/Emails",
+                url: "Contacts/{id}/Emails/Create",
                 defaults: new { controller = "Emails", action = "Create" }
-            );
+            );            
 
             routes.MapRoute(
                 name: "Emails",
@@ -35,7 +35,7 @@ namespace AddressBookApp
                 name: "Addresses",
                 url: "Contacts/{id}/Addresses/{addressId}/{action}",
                 defaults: new { controller = "Addresses", action = "Edit"}
-            );
+            );          
 
             routes.MapRoute(
                 name: "Default",

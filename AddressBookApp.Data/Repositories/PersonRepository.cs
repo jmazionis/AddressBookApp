@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Dynamic;
 using AddressBookApp.Data.Context;
 using System.Data.Entity;
 
@@ -50,6 +51,43 @@ namespace AddressBookApp.Data.Repositories
             personBeingUpdated.Name = personUpdatesModel.Name;
             personBeingUpdated.Surname = personUpdatesModel.Surname;
             _dbContext.SaveChanges();
+        }
+
+        public IEnumerable<Person> GetFilteredList(string searchValue,
+                                                   int itemsStartIndex,
+                                                   int itemsToTake,
+                                                   string sortingConfig,
+                                                   out int filteredCount,
+                                                   out int totalCount)
+        {
+            var contactsQuery = _dbContext.People
+                                          .Include(x => x.Emails)
+                                          .Include(x => x.Addresses)
+                                          .AsQueryable();
+
+            totalCount = contactsQuery.Count();
+            filteredCount = 0;
+
+            //Filter by search value
+            if (searchValue != String.Empty)
+            {
+                searchValue = searchValue.Trim();
+                contactsQuery = contactsQuery.Where(x => x.Name.Contains(searchValue) ||
+                                                    x.Surname.Contains(searchValue) ||
+                                                    x.Emails.Any(email => email.Name.Contains(searchValue)) ||
+                                                    x.Addresses.Any(addr => addr.Name.Contains(searchValue)));                
+            }
+
+            filteredCount = contactsQuery.Count();
+            contactsQuery = contactsQuery.OrderBy(sortingConfig == String.Empty ? "surname asc" : sortingConfig);
+
+            //Paginate
+            contactsQuery = contactsQuery.Skip(itemsStartIndex)
+                                         .Take(itemsToTake);
+
+            var marterializedContacts = contactsQuery.ToList();
+
+            return marterializedContacts;
         }
     }
 }
