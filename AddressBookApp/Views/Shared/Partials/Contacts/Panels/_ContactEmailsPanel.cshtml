@@ -1,0 +1,48 @@
+﻿@model AddressBookApp.ViewModels.ContactFormViewModel
+
+<div class="col-xs-12 col-md-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Manage emails
+            <span>
+                @Html.ActionLink("Add new", "Create", "Emails", new { @id = Model.Id },
+                                                new
+                                                {
+                                                    @class = "glyphicon glyphicon-plus"
+                                                })
+            </span>
+        </div>
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model.Emails != null && Model.Emails.Count() > 0)
+                        {
+                            foreach (var email in Model.Emails)
+                            {
+                                <tr>
+                                    <td>
+                                        @email.Name
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink("Edit", "Edit", "Emails", new { emailId = email.Id }, null) |                                      
+                                        @Html.ActionLink("Delete", "Delete", "Emails", new { emailId = email.Id }, new {
+                                            data_toggle = "modal",
+                                            data_target = "#modal-container"
+                                        })
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

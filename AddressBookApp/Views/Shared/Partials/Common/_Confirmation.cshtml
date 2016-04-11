@@ -1,0 +1,30 @@
+﻿@if (!string.IsNullOrEmpty(TempData["SuccessMessage"] as string))
+{
+    <div class="container" id="confirmation-message">
+        <div class="row">
+            <div class="col-xs-12">                
+                <div class="alert alert-success fade in">
+                    <span class="close" data-dismiss="alert" aria-label="close">&times;</span>
+                    <strong>Success!</strong>
+                    @TempData["SuccessMessage"]
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(TempData["ErrorMessage"] as string))
+{
+    <div class="container" id="confirmation-message">
+        <div class="row">
+            <div class="col-xs-12">                
+                <div class="alert alert-danger fade in">
+                    <span class="close" data-dismiss="alert" aria-label="close">&times;</span>
+                    <strong>An error occured!</strong>
+                    @TempData["ErrorMessage"]
+                </div>
+            </div>
+        </div>
+    </div>    
+}
+

@@ -1,0 +1,50 @@
+﻿@model AddressBookApp.ViewModels.ContactFormViewModel
+
+<div class="col-xs-12 col-md-6">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Manage addresses
+            <span>
+                @Html.ActionLink("Add new", "Create", "Addresses", new { @id = Model.Id },
+                                                new
+                                                {
+                                                    @class = "glyphicon glyphicon-plus"
+                                                })
+            </span>
+        </div>
+        <div class="panel-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Address</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model.Addresses != null && Model.Addresses.Count() > 0)
+                        {
+                            foreach (var address in Model.Addresses)
+                            {
+                                <tr>
+                                    <td>
+                                        @address.Name
+                                    </td>
+                                    <td>
+                                        @Html.ActionLink("Edit", "Edit", "Addresses", new { addressId = address.Id }, null) |                                       
+                                        @Html.ActionLink("Delete", "Delete", "Addresses", new { addressId = address.Id }, new
+                                                        {
+                                                            data_toggle = "modal",
+                                                            data_target = "#modal-container"
+                                                        })
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
