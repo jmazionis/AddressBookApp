@@ -1,1 +1,3 @@
-﻿
+﻿#contacts-list tbody tr:last-child{
+    border-bottom: 1px solid #ddd;
+}

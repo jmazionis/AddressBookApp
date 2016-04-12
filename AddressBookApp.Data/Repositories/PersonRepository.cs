@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Linq.Dynamic;
 using AddressBookApp.Data.Context;
 using System.Data.Entity;
+using AddressBookApp.Data.Helpers;
 
 namespace AddressBookApp.Data.Repositories
 {
@@ -53,10 +54,7 @@ namespace AddressBookApp.Data.Repositories
             _dbContext.SaveChanges();
         }
 
-        public IEnumerable<Person> GetFilteredList(string searchValue,
-                                                   int itemsStartIndex,
-                                                   int itemsToTake,
-                                                   string sortingConfig,
+        public IEnumerable<Person> GetFilteredList(DataTablesFilteringModel filter,
                                                    out int filteredCount,
                                                    out int totalCount)
         {
@@ -69,7 +67,7 @@ namespace AddressBookApp.Data.Repositories
             filteredCount = 0;
 
             //Filter by search value
-            if (searchValue != String.Empty)
+            if (filter != String.Empty)
             {
                 searchValue = searchValue.Trim();
                 contactsQuery = contactsQuery.Where(x => x.Name.Contains(searchValue) ||
@@ -79,11 +77,11 @@ namespace AddressBookApp.Data.Repositories
             }
 
             filteredCount = contactsQuery.Count();
-            contactsQuery = contactsQuery.OrderBy(sortingConfig == String.Empty ? "surname asc" : sortingConfig);
+            contactsQuery = contactsQuery.OrderBy(filter.SortingConfig == String.Empty ? "surname asc" : sortingConfig);
 
             //Paginate
-            contactsQuery = contactsQuery.Skip(itemsStartIndex)
-                                         .Take(itemsToTake);
+            contactsQuery = contactsQuery.Skip(filter.StartIndex)
+                                         .Take(filter.ItemAmount);
 
             var marterializedContacts = contactsQuery.ToList();
 

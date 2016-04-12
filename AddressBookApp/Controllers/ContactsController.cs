@@ -23,23 +23,40 @@ namespace AddressBookApp.Controllers
         public JsonResult GetFilteredContacts([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dataTablesRequestModel)
         {
             int filteredCount;
-            int totalCount;
+            int totalCount;            
 
             var sortedColumns = dataTablesRequestModel.Columns.GetSortedColumns();
             var sortingConfig = DataTablesHelper.GetSortingConfig(sortedColumns);
+            var searchConfig = DataTablesHelper.GetSearchingConfig(dataTablesRequestModel.Search.Value, dataTablesRequestModel.Columns);
 
-            var filteredResults = _personRepository.GetFilteredList(dataTablesRequestModel.Search.Value,
-                                                                    dataTablesRequestModel.Start,
-                                                                    dataTablesRequestModel.Length,
-                                                                    sortingConfig,
-                                                                    out filteredCount,
-                                                                    out totalCount);                 
+            
+
+            //var filteredResults = _personRepository.GetFilteredList(dataTablesRequestModel.Search.Value,
+            //                                                        dataTablesRequestModel.Start,
+            //                                                        dataTablesRequestModel.Length,
+            //                                                        sortingConfig,
+            //                                                        out filteredCount,
+            //                                                        out totalCount);                 
 
             var data = filteredResults.Select(contact => new ContactListItemViewModel
             {
                 Id = contact.Id,
                 Name = contact.Name,
-                Surname = contact.Surname              
+                Surname = contact.Surname,
+                Emails = contact.Emails
+                                .Select(email => new EmailViewModel
+                                {
+                                    Id = email.Id,
+                                    Name = email.Name,
+                                    PersonId = email.PersonId
+                                }),
+                Addresses = contact.Addresses
+                                    .Select(address => new AddressViewModel
+                                    {
+                                        Id = address.Id,
+                                        Name = address.Name,
+                                        PersonId = address.PersonId
+                                    })                             
             });                     
 
             return Json(new DataTablesResponse

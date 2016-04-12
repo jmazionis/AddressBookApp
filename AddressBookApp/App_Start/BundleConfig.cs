@@ -26,7 +26,7 @@ namespace AddressBook.App_Start
                 .Include("~/Scripts/DataTables/jquery.dataTables.js")
                 .Include("~/Scripts/DataTables/dataTables.bootstrap.js"));
 
-            bundles.Add(new StyleBundle("~/styles/dataTables")
+            bundles.Add(new StyleBundle("~/styles/dataTables")                    
                     .Include("~/Content/DataTables/css/dataTables.bootstrap.css"));
 
             bundles.Add(new StyleBundle("~/styles/contact-list")                    

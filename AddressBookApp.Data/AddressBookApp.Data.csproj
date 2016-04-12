@@ -94,6 +94,7 @@
     <Compile Include="Context\Person.cs">
       <DependentUpon>AddressBookDbContext.tt</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\DataTablesFilteringModel.cs" />
     <Compile Include="Infrastructure\IUnitOfWork.cs" />
     <Compile Include="Interfaces\IAddressRepository.cs" />
     <Compile Include="Interfaces\IEmailRepository.cs" />
@@ -128,9 +129,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="App.Config">
       <SubType>Designer</SubType>

@@ -21,5 +21,16 @@ namespace AddressBookApp.Helpers
 
             return sortingConfig;
         }
+
+        public static Dictionary<string, string> GetSearchingConfig(string globalSearchValue, ColumnCollection columns)
+        {
+            var results = new Dictionary<string, string>();
+            results.Add("GlobalSearch", globalSearchValue);
+            foreach (var column in columns)
+            {
+                results.Add(column.Name, column.Search.Value);
+            }
+            return results;
+        }
     }
 }
