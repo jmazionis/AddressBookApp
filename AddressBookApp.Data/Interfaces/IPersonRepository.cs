@@ -1,10 +1,6 @@
-﻿using AddressBookApp.Data.Context;
-using AddressBookApp.Data.Helpers;
-using System;
+﻿using AddressBookApp.Common.Utils.Models;
+using AddressBookApp.Data.Context;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AddressBookApp.Data.Interfaces
 {

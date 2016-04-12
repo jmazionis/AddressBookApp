@@ -7,6 +7,7 @@ using AddressBookApp.ViewModels;
 using AddressBookApp.Data.Interfaces;
 using DataTables.Mvc;
 using AddressBookApp.Helpers;
+using AddressBookApp.Common.Utils.Models;
 
 namespace AddressBookApp.Controllers
 {
@@ -28,15 +29,15 @@ namespace AddressBookApp.Controllers
             var sortedColumns = dataTablesRequestModel.Columns.GetSortedColumns();
             var sortingConfig = DataTablesHelper.GetSortingConfig(sortedColumns);
             var searchConfig = DataTablesHelper.GetSearchingConfig(dataTablesRequestModel.Search.Value, dataTablesRequestModel.Columns);
+            var filterConfig = new DataTablesFilteringModel
+            {
+                SearchConfig = searchConfig,
+                SortingConfig = sortingConfig,
+                StartIndex = dataTablesRequestModel.Start,
+                ItemAmount = dataTablesRequestModel.Length,
+            };          
 
-            
-
-            //var filteredResults = _personRepository.GetFilteredList(dataTablesRequestModel.Search.Value,
-            //                                                        dataTablesRequestModel.Start,
-            //                                                        dataTablesRequestModel.Length,
-            //                                                        sortingConfig,
-            //                                                        out filteredCount,
-            //                                                        out totalCount);                 
+            var filteredResults = _personRepository.GetFilteredList(filterConfig, out filteredCount, out totalCount);
 
             var data = filteredResults.Select(contact => new ContactListItemViewModel
             {
@@ -51,12 +52,12 @@ namespace AddressBookApp.Controllers
                                     PersonId = email.PersonId
                                 }),
                 Addresses = contact.Addresses
-                                    .Select(address => new AddressViewModel
-                                    {
-                                        Id = address.Id,
-                                        Name = address.Name,
-                                        PersonId = address.PersonId
-                                    })                             
+                                .Select(address => new AddressViewModel
+                                {
+                                    Id = address.Id,
+                                    Name = address.Name,
+                                    PersonId = address.PersonId
+                                })                             
             });                     
 
             return Json(new DataTablesResponse
@@ -103,8 +104,7 @@ namespace AddressBookApp.Controllers
                 Addresses = new List<AddressViewModel>()        
             };
 
-            return View(contactFormViewModel);
-            //return PartialView("Partials/Contacts/_ContactFormModal");
+            return View(contactFormViewModel);            
         }
 
         [HttpPost]

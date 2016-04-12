@@ -396,6 +396,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\AddressBookApp.Common\AddressBookApp.Common.csproj">
+      <Project>{c06a7990-d90f-471b-a1a7-67beeb247d5a}</Project>
+      <Name>AddressBookApp.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AddressBookApp.Data\AddressBookApp.Data.csproj">
       <Project>{7427cefc-2daf-4620-adb1-28519cc57a9a}</Project>
       <Name>AddressBookApp.Data</Name>

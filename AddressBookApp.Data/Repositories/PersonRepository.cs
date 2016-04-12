@@ -2,12 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Linq.Dynamic;
 using AddressBookApp.Data.Context;
 using System.Data.Entity;
-using AddressBookApp.Data.Helpers;
+using AddressBookApp.Common.Utils.Models;
 
 namespace AddressBookApp.Data.Repositories
 {
@@ -66,26 +64,56 @@ namespace AddressBookApp.Data.Repositories
             totalCount = contactsQuery.Count();
             filteredCount = 0;
 
-            //Filter by search value
-            if (filter != String.Empty)
-            {
-                searchValue = searchValue.Trim();
-                contactsQuery = contactsQuery.Where(x => x.Name.Contains(searchValue) ||
-                                                    x.Surname.Contains(searchValue) ||
-                                                    x.Emails.Any(email => email.Name.Contains(searchValue)) ||
-                                                    x.Addresses.Any(addr => addr.Name.Contains(searchValue)));                
-            }
+            //Filter by global search value
+            contactsQuery = FilterBySearchCriteria(contactsQuery, filter.SearchConfig);
 
             filteredCount = contactsQuery.Count();
-            contactsQuery = contactsQuery.OrderBy(filter.SortingConfig == String.Empty ? "surname asc" : sortingConfig);
+            contactsQuery = contactsQuery.OrderBy(filter.SortingConfig == String.Empty ? "surname asc" : filter.SortingConfig);
 
             //Paginate
             contactsQuery = contactsQuery.Skip(filter.StartIndex)
                                          .Take(filter.ItemAmount);
 
-            var marterializedContacts = contactsQuery.ToList();
+            return contactsQuery.ToList();
+        }
 
-            return marterializedContacts;
+        private IQueryable<Person> FilterBySearchCriteria(IQueryable<Person> query, Dictionary<string, string> searchCriteria)
+        {
+            string searchValue = string.Empty;
+            if (searchCriteria["GlobalSearch"] != String.Empty)
+            {
+                searchValue = searchCriteria["GlobalSearch"].Trim();
+                query = query.Where(x => x.Name.Contains(searchValue) ||
+                                                    x.Surname.Contains(searchValue) ||
+                                                    x.Emails.Any(email => email.Name.Contains(searchValue)) ||
+                                                    x.Addresses.Any(addr => addr.Name.Contains(searchValue)));
+            }
+
+            if (searchCriteria["Name"] != String.Empty)
+            {
+                searchValue = searchCriteria["Name"].Trim();
+                query = query.Where(x => x.Name.Contains(searchValue));
+            }
+
+            if (searchCriteria["Surname"] != String.Empty)
+            {
+                searchValue = searchCriteria["Surname"].Trim();
+                query = query.Where(x => x.Surname.Contains(searchValue));
+            }
+
+            if (searchCriteria["Emails"] != String.Empty)
+            {
+                searchValue = searchCriteria["Emails"].Trim();
+                query = query.Where(x => x.Emails.Any(email => email.Name.Contains(searchValue)));
+            }
+
+            if (searchCriteria["Addresses"] != String.Empty)
+            {
+                searchValue = searchCriteria["Addresses"].Trim();
+                query = query.Where(x => x.Addresses.Any(address => address.Name.Contains(searchValue)));
+            }
+
+            return query;
         }
     }
 }

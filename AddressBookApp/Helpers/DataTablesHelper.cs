@@ -28,7 +28,10 @@ namespace AddressBookApp.Helpers
             results.Add("GlobalSearch", globalSearchValue);
             foreach (var column in columns)
             {
-                results.Add(column.Name, column.Search.Value);
+                if (column.Data != string.Empty)
+                {
+                    results.Add(column.Data, column.Search.Value);
+                }               
             }
             return results;
         }

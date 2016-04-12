@@ -94,7 +94,6 @@
     <Compile Include="Context\Person.cs">
       <DependentUpon>AddressBookDbContext.tt</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\DataTablesFilteringModel.cs" />
     <Compile Include="Infrastructure\IUnitOfWork.cs" />
     <Compile Include="Interfaces\IAddressRepository.cs" />
     <Compile Include="Interfaces\IEmailRepository.cs" />
@@ -129,7 +128,12 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\AddressBookApp.Common\AddressBookApp.Common.csproj">
+      <Project>{c06a7990-d90f-471b-a1a7-67beeb247d5a}</Project>
+      <Name>AddressBookApp.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <None Include="App.Config">
       <SubType>Designer</SubType>
