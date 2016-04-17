@@ -3,6 +3,7 @@ using AddressBookApp.Data.Context;
 using AddressBookApp.ViewModels;
 using AddressBookApp.Data.Interfaces;
 using AddressBookApp.Data.Infrastructure;
+using System;
 
 namespace AddressBookApp.Controllers
 {
@@ -17,30 +18,39 @@ namespace AddressBookApp.Controllers
 
         // GET: Addresses/Create
         public ActionResult Create(int id)
-        {
+        {                        
             return View(new AddressViewModel
             {
                 PersonId = id
-            });
+            });              
         }
       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Name,PersonId")] AddressViewModel addressViewModel)
         {
-            if (ModelState.IsValid)
-            {
-                _unitOfWork.AddressRepository.AddNewAddressToContact(new Address
+            try
+            {                
+                if (ModelState.IsValid)
                 {
-                    PersonId = addressViewModel.PersonId,
-                    Name = addressViewModel.Name
-                });
-                TempData["SuccessMessage"] = "Address has been successfully added!";
-                _unitOfWork.CommitChanges();
-                return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
-            }            
+                    _unitOfWork.AddressRepository.AddNewAddressToContact(new Address
+                    {
+                        PersonId = addressViewModel.PersonId,
+                        Name = addressViewModel.Name
+                    });
+                    TempData["SuccessMessage"] = "Address has been successfully added!";
+                    _unitOfWork.CommitChanges();
+                    return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
+                }
+                return View(addressViewModel);
 
-            return View(addressViewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occured while creating new address";
+                return View(addressViewModel);
+            }
+            
         }
 
         // GET: Addresses/Edit/5
@@ -59,20 +69,29 @@ namespace AddressBookApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Name,PersonId")] AddressViewModel addressViewModel)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _unitOfWork.AddressRepository.UpdateAddress(
-                new Address
+                if (ModelState.IsValid)
                 {
-                    Id = addressViewModel.Id,
-                    Name = addressViewModel.Name,
-                    PersonId = addressViewModel.PersonId
-                });
-                TempData["SuccessMessage"] = "Address has been successfully updated!";
-                _unitOfWork.CommitChanges();
-                return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
+                   _unitOfWork.AddressRepository.UpdateAddress(
+                   new Address
+                   {
+                       Id = addressViewModel.Id,
+                       Name = addressViewModel.Name,
+                       PersonId = addressViewModel.PersonId
+                   });
+                    TempData["SuccessMessage"] = "Address has been successfully updated!";
+                    _unitOfWork.CommitChanges();
+                    return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
+                }
+                return View(addressViewModel);
             }
-            return View(addressViewModel);
+                
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occured while updating address";
+                return View(addressViewModel);
+            }                       
         }
      
         public ActionResult Delete(int addressId)
@@ -90,10 +109,19 @@ namespace AddressBookApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete([Bind(Include = "Id,PersonId,Name")] AddressViewModel addressViewModel)
         {
-            _unitOfWork.AddressRepository.DeleteAddress(addressViewModel.Id);
-            _unitOfWork.CommitChanges();
-            TempData["SuccessMessage"] = "Address has been successfully deleted";
-            return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
+            try
+            {
+                _unitOfWork.AddressRepository.DeleteAddress(addressViewModel.Id);
+                _unitOfWork.CommitChanges();
+                TempData["SuccessMessage"] = "Address has been successfully deleted";
+                return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occured while deleting address";
+                return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
+            }
+            
         }
     }
 }

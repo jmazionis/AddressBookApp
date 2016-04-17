@@ -3,6 +3,7 @@ using AddressBookApp.Data.Context;
 using AddressBookApp.ViewModels;
 using AddressBookApp.Data.Interfaces;
 using AddressBookApp.Data.Infrastructure;
+using System;
 
 namespace AddressBookApp.Controllers
 {
@@ -27,18 +28,27 @@ namespace AddressBookApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Name,PersonId")] EmailViewModel emailViewModel)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _unitOfWork.EmailRepository.AddNewEmailToContact(new Email
+                if (ModelState.IsValid)
                 {
-                    PersonId = emailViewModel.PersonId,
-                    Name = emailViewModel.Name
-                });
-                _unitOfWork.CommitChanges();
-                TempData["SuccessMessage"] = "New email has been successfully added!";
-                return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
-            }          
-            return View(emailViewModel);
+                    _unitOfWork.EmailRepository.AddNewEmailToContact(new Email
+                    {
+                        PersonId = emailViewModel.PersonId,
+                        Name = emailViewModel.Name
+                    });
+                    _unitOfWork.CommitChanges();
+                    TempData["SuccessMessage"] = "New email has been successfully added!";
+                    return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
+                }
+                return View(emailViewModel);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occured while creating new email";
+                return View(emailViewModel);
+            }
+          
         }
         
         public ActionResult Edit([Bind(Include = "emailId")] int emailId)
@@ -56,20 +66,28 @@ namespace AddressBookApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Name,PersonId")] EmailViewModel emailViewModel)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _unitOfWork.EmailRepository.UpdateEmail(
-                new Email
+                if (ModelState.IsValid)
                 {
-                    Id = emailViewModel.Id,
-                    Name = emailViewModel.Name,
-                    PersonId = emailViewModel.PersonId
-                });
-                _unitOfWork.CommitChanges();
-                TempData["SuccessMessage"] = "Email has been successfully updated!";
-                return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
+                    _unitOfWork.EmailRepository.UpdateEmail(
+                    new Email
+                    {
+                        Id = emailViewModel.Id,
+                        Name = emailViewModel.Name,
+                        PersonId = emailViewModel.PersonId
+                    });
+                    _unitOfWork.CommitChanges();
+                    TempData["SuccessMessage"] = "Email has been successfully updated!";
+                    return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
+                }
+                return View(emailViewModel);
             }
-            return View(emailViewModel);
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "An error occured while updating email";
+                return View(emailViewModel);
+            }           
         }
 
         // GET: Emails/Delete/5
@@ -88,10 +106,19 @@ namespace AddressBookApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete([Bind(Include = "Id,PersonId,Name")] EmailViewModel emailViewModel)
         {
-            _unitOfWork.EmailRepository.DeleteEmail(emailViewModel.Id);
-            _unitOfWork.CommitChanges();
-            TempData["SuccessMessage"] = "Email has been successfully deleted";
-            return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
+            try
+            {
+                _unitOfWork.EmailRepository.DeleteEmail(emailViewModel.Id);
+                _unitOfWork.CommitChanges();
+                TempData["SuccessMessage"] = "Email has been successfully deleted";
+                return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "An error occured while deleting email";
+                return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
+            }
+           
         }
     }
 }

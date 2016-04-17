@@ -358,6 +358,7 @@
     <Compile Include="Controllers\AddressesController.cs" />
     <Compile Include="Controllers\ContactsController.cs" />
     <Compile Include="Controllers\EmailsController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Helpers\DataTablesHelper.cs" />
     <Compile Include="ViewModels\AddressViewModel.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -391,6 +392,8 @@
     <Content Include="Views\Emails\Edit.cshtml" />
     <Content Include="Views\Shared\Partials\Addresses\_DeleteAddressModal.cshtml" />
     <Content Include="Views\Shared\Partials\Emails\_DeleteEmailModal.cshtml" />
+    <Content Include="Views\Error\NotFound.cshtml" />
+    <Content Include="Views\Error\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -9,6 +9,7 @@ using DataTables.Mvc;
 using AddressBookApp.Helpers;
 using AddressBookApp.Common.Utils.Models;
 using AddressBookApp.Data.Infrastructure;
+using System;
 
 namespace AddressBookApp.Controllers
 {
@@ -110,20 +111,26 @@ namespace AddressBookApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Id,Name,Surname")] ContactFormViewModel createPersonViewModel)
-        {            
-            if (ModelState.IsValid)
+        {
+            try
             {
-                _unitOfWork.PersonRepository.CreateNewPerson(new Person
+                if (ModelState.IsValid)
                 {
-                    Name = createPersonViewModel.Name,
-                    Surname = createPersonViewModel.Surname
-                });
-                TempData["SuccessMessage"] = "Contact has been successfully created";
-                _unitOfWork.CommitChanges();
+                    _unitOfWork.PersonRepository.CreateNewPerson(new Person
+                    {
+                        Name = createPersonViewModel.Name,
+                        Surname = createPersonViewModel.Surname
+                    });
+                    TempData["SuccessMessage"] = "Contact has been successfully created";
+                    _unitOfWork.CommitChanges();
+                }
+                return View(createPersonViewModel);
             }
-            
-            
-            return View(createPersonViewModel);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occured while creating new contact";
+                return View(createPersonViewModel);
+            }                                                    
         }
 
         // GET: People/Edit/5
@@ -157,35 +164,27 @@ namespace AddressBookApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "Id,Name,Surname,Emails,Addresses")] ContactFormViewModel editPersonViewModel)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _unitOfWork.PersonRepository.UpdatePerson(new Person
+                if (ModelState.IsValid)
                 {
-                    Id = editPersonViewModel.Id,
-                    Name = editPersonViewModel.Name,
-                    Surname = editPersonViewModel.Surname
-                });               
-                _unitOfWork.CommitChanges();
+                    _unitOfWork.PersonRepository.UpdatePerson(new Person
+                    {
+                        Id = editPersonViewModel.Id,
+                        Name = editPersonViewModel.Name,
+                        Surname = editPersonViewModel.Surname
+                    });
+                    _unitOfWork.CommitChanges();
 
-                //var updatedContact = _unitOfWork.PersonRepository.GetById(editPersonViewModel.Id);
-                //editPersonViewModel.Addresses = updatedContact.Addresses
-                //                   .Select(address => new AddressViewModel
-                //                   {
-                //                       Id = address.Id,
-                //                       Name = address.Name,
-                //                       PersonId = address.PersonId
-                //                   }).ToList();
-                //editPersonViewModel.Emails = updatedContact.Emails
-                //                  .Select(email => new EmailViewModel
-                //                  {
-                //                      Id = email.Id,
-                //                      Name = email.Name,
-                //                      PersonId = email.PersonId
-                //                  }).ToList();
-                TempData["SuccessMessage"] = "Contact has been successfully updated";
+                    TempData["SuccessMessage"] = "Contact has been successfully updated";                    
+                }
+                return View("Create", editPersonViewModel);
             }
-                        
-            return View("Create", editPersonViewModel);
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "An error occured while editing contact";
+                return View("Create", editPersonViewModel);
+            }                                              
         }
 
         // GET: People/Delete/5
@@ -206,10 +205,18 @@ namespace AddressBookApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmation([Bind(Include = "Id")]int id)
         {
-            _unitOfWork.PersonRepository.DeletePerson(id);            
-            _unitOfWork.CommitChanges();
-            TempData["SuccessMessage"] = "Contact has been successfully deleted!";
-            return RedirectToAction("Index");
+            try
+            {
+                _unitOfWork.PersonRepository.DeletePerson(id);
+                _unitOfWork.CommitChanges();
+                TempData["SuccessMessage"] = "Contact has been successfully deleted!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "An error occured while deleting contact";
+                return RedirectToAction("Index");
+            }           
         }      
     }
 }
