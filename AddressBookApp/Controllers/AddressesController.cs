@@ -2,16 +2,17 @@
 using AddressBookApp.Data.Context;
 using AddressBookApp.ViewModels;
 using AddressBookApp.Data.Interfaces;
+using AddressBookApp.Data.Infrastructure;
 
 namespace AddressBookApp.Controllers
 {
     public class AddressesController : Controller
     {
-        private readonly IAddressRepository _addressRepository;
+        private readonly IAddressBookUnitOfWork _unitOfWork;
 
-        public AddressesController(IAddressRepository addressRepository)
+        public AddressesController(IAddressBookUnitOfWork unitOfWork)
         {
-            _addressRepository = addressRepository;
+            _unitOfWork = unitOfWork;
         }                       
 
         // GET: Addresses/Create
@@ -29,12 +30,13 @@ namespace AddressBookApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _addressRepository.AddNewAddressToContact(new Address
+                _unitOfWork.AddressRepository.AddNewAddressToContact(new Address
                 {
                     PersonId = addressViewModel.PersonId,
                     Name = addressViewModel.Name
                 });
                 TempData["SuccessMessage"] = "Address has been successfully added!";
+                _unitOfWork.CommitChanges();
                 return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
             }            
 
@@ -44,7 +46,7 @@ namespace AddressBookApp.Controllers
         // GET: Addresses/Edit/5
         public ActionResult Edit([Bind(Include = "addressId")] int addressId)
         {
-            var addressModel = _addressRepository.GetById(addressId);           
+            var addressModel = _unitOfWork.AddressRepository.GetById(addressId);           
             return View(new AddressViewModel
             {
                 Id = addressModel.Id,
@@ -59,7 +61,7 @@ namespace AddressBookApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _addressRepository.UpdateAddress(
+                _unitOfWork.AddressRepository.UpdateAddress(
                 new Address
                 {
                     Id = addressViewModel.Id,
@@ -67,6 +69,7 @@ namespace AddressBookApp.Controllers
                     PersonId = addressViewModel.PersonId
                 });
                 TempData["SuccessMessage"] = "Address has been successfully updated!";
+                _unitOfWork.CommitChanges();
                 return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
             }
             return View(addressViewModel);
@@ -74,7 +77,7 @@ namespace AddressBookApp.Controllers
      
         public ActionResult Delete(int addressId)
         {
-            var targetAddress = _addressRepository.GetById(addressId);
+            var targetAddress = _unitOfWork.AddressRepository.GetById(addressId);
             return PartialView("Partials/Addresses/_DeleteAddressModal", new AddressViewModel
             {
                 Id = targetAddress.Id,
@@ -87,7 +90,8 @@ namespace AddressBookApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete([Bind(Include = "Id,PersonId,Name")] AddressViewModel addressViewModel)
         {
-            _addressRepository.DeleteAddress(addressViewModel.Id);
+            _unitOfWork.AddressRepository.DeleteAddress(addressViewModel.Id);
+            _unitOfWork.CommitChanges();
             TempData["SuccessMessage"] = "Address has been successfully deleted";
             return RedirectToAction("Edit", "Contacts", new { id = addressViewModel.PersonId });
         }

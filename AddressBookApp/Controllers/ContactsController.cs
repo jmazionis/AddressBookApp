@@ -8,17 +8,17 @@ using AddressBookApp.Data.Interfaces;
 using DataTables.Mvc;
 using AddressBookApp.Helpers;
 using AddressBookApp.Common.Utils.Models;
+using AddressBookApp.Data.Infrastructure;
 
 namespace AddressBookApp.Controllers
 {
     public class ContactsController : Controller
     {
+        private readonly IAddressBookUnitOfWork _unitOfWork;
 
-        private readonly IPersonRepository _personRepository;
-
-        public ContactsController(IPersonRepository personRepository)
+        public ContactsController(IAddressBookUnitOfWork unitOfWork)
         {
-            _personRepository = personRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public JsonResult GetFilteredContacts([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dataTablesRequestModel)
@@ -37,7 +37,7 @@ namespace AddressBookApp.Controllers
                 ItemAmount = dataTablesRequestModel.Length,
             };          
 
-            var filteredResults = _personRepository.GetFilteredList(filterConfig, out filteredCount, out totalCount);
+            var filteredResults = _unitOfWork.PersonRepository.GetFilteredList(filterConfig, out filteredCount, out totalCount);
 
             var data = filteredResults.Select(contact => new ContactListItemViewModel
             {
@@ -72,7 +72,7 @@ namespace AddressBookApp.Controllers
         // GET: People
         public ActionResult Index()
         {           
-            var contactListModels = _personRepository.GetAll();
+            var contactListModels = _unitOfWork.PersonRepository.GetAll();
             var contactListViewModels = contactListModels.Select(contact => new ContactListItemViewModel
             {
                 Id = contact.Id,
@@ -113,20 +113,23 @@ namespace AddressBookApp.Controllers
         {            
             if (ModelState.IsValid)
             {
-                _personRepository.CreateNewPerson(new Person
+                _unitOfWork.PersonRepository.CreateNewPerson(new Person
                 {
                     Name = createPersonViewModel.Name,
                     Surname = createPersonViewModel.Surname
                 });
+                TempData["SuccessMessage"] = "Contact has been successfully created";
+                _unitOfWork.CommitChanges();
             }
-            TempData["SuccessMessage"] = "Contact has been successfully created";
+            
+            
             return View(createPersonViewModel);
         }
 
         // GET: People/Edit/5
         public ActionResult Edit([Bind(Include = "Id")] int id)
         {
-            var contactModel = _personRepository.GetById(id);
+            var contactModel = _unitOfWork.PersonRepository.GetById(id);
             var contactViewModel = new ContactFormViewModel
             {
                 Id = contactModel.Id,
@@ -138,40 +141,57 @@ namespace AddressBookApp.Controllers
                                        Id = email.Id,
                                        Name = email.Name,
                                        PersonId = email.PersonId
-                                   }),
+                                   }).ToList(),
                 Addresses = contactModel.Addresses
                                    .Select(address => new AddressViewModel
                                    {
                                        Id = address.Id,
                                        Name = address.Name,
                                        PersonId = address.PersonId
-                                   })                               
+                                   }).ToList()                              
             };
             return View("Create", contactViewModel);
         }
        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Name,Surname")] ContactFormViewModel editPersonViewModel)
+        public ActionResult Edit([Bind(Include = "Id,Name,Surname,Emails,Addresses")] ContactFormViewModel editPersonViewModel)
         {
             if (ModelState.IsValid)
             {
-                _personRepository.UpdatePerson(new Person
+                _unitOfWork.PersonRepository.UpdatePerson(new Person
                 {
                     Id = editPersonViewModel.Id,
                     Name = editPersonViewModel.Name,
                     Surname = editPersonViewModel.Surname
-                });
+                });               
+                _unitOfWork.CommitChanges();
+
+                //var updatedContact = _unitOfWork.PersonRepository.GetById(editPersonViewModel.Id);
+                //editPersonViewModel.Addresses = updatedContact.Addresses
+                //                   .Select(address => new AddressViewModel
+                //                   {
+                //                       Id = address.Id,
+                //                       Name = address.Name,
+                //                       PersonId = address.PersonId
+                //                   }).ToList();
+                //editPersonViewModel.Emails = updatedContact.Emails
+                //                  .Select(email => new EmailViewModel
+                //                  {
+                //                      Id = email.Id,
+                //                      Name = email.Name,
+                //                      PersonId = email.PersonId
+                //                  }).ToList();
                 TempData["SuccessMessage"] = "Contact has been successfully updated";
             }
-            
+                        
             return View("Create", editPersonViewModel);
         }
 
         // GET: People/Delete/5
         public ActionResult Delete(int id)
         {
-            var personModel = _personRepository.GetById(id);
+            var personModel = _unitOfWork.PersonRepository.GetById(id);
             return PartialView("Partials/Contacts/Modals/_DeleteContactModal", 
                 new ContactListItemViewModel
                 {
@@ -186,7 +206,8 @@ namespace AddressBookApp.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmation([Bind(Include = "Id")]int id)
         {
-            _personRepository.DeletePerson(id);
+            _unitOfWork.PersonRepository.DeletePerson(id);            
+            _unitOfWork.CommitChanges();
             TempData["SuccessMessage"] = "Contact has been successfully deleted!";
             return RedirectToAction("Index");
         }      

@@ -14,7 +14,7 @@ namespace AddressBookApp.ViewModels
         public string Name { get; set; }       
         [Required(ErrorMessage = "You must provide contact's surname")]
         public string Surname { get; set; }               
-        public IEnumerable<EmailViewModel> Emails { get; set; }
-        public IEnumerable<AddressViewModel> Addresses { get; set; }
+        public List<EmailViewModel> Emails { get; set; }
+        public List<AddressViewModel> Addresses { get; set; }
     }
 }

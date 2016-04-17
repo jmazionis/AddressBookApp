@@ -33,10 +33,9 @@
                                     <td>
                                         @Html.ActionLink("Edit", "Edit", "Addresses", new { addressId = address.Id }, null) |                                       
                                         @Html.ActionLink("Delete", "Delete", "Addresses", new { addressId = address.Id }, new
-                                                        {
-                                                            data_toggle = "modal",
-                                                            data_target = "#modal-container"
-                                                        })
+                                        {
+                                            @class = "modal-link"
+                                        })
                                     </td>
                                 </tr>
                             }

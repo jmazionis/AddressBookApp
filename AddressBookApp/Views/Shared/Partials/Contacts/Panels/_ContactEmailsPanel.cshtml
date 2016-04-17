@@ -33,8 +33,7 @@
                                     <td>
                                         @Html.ActionLink("Edit", "Edit", "Emails", new { emailId = email.Id }, null) |                                      
                                         @Html.ActionLink("Delete", "Delete", "Emails", new { emailId = email.Id }, new {
-                                            data_toggle = "modal",
-                                            data_target = "#modal-container"
+                                            @class = "modal-link"
                                         })
                                     </td>
                                 </tr>

@@ -2,6 +2,7 @@
 using AddressBookApp.Data.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,23 +11,21 @@ namespace AddressBookApp.Data.Repositories
 {
     public class AddressRepository : IAddressRepository
     {
-        private readonly AddressBookDbContext _dbContext;
-        public AddressRepository()
+        private readonly IAddressBookDbContext _dbContext;
+        public AddressRepository(IAddressBookDbContext dbContext)
         {
-            _dbContext = new AddressBookDbContext();
+            _dbContext = dbContext;
         }
 
         public void AddNewAddressToContact(Address address)
         {
-            _dbContext.Addresses.Add(address);
-            _dbContext.SaveChanges();
+            _dbContext.Addresses.Add(address);            
         }       
 
         public void DeleteAddress(int addressId)
         {
             var targetAddress = _dbContext.Addresses.SingleOrDefault(x => x.Id == addressId);
-            _dbContext.Addresses.Remove(targetAddress);
-            _dbContext.SaveChanges();
+            _dbContext.Addresses.Remove(targetAddress);            
         }
 
         public Address GetById(int id)
@@ -36,9 +35,8 @@ namespace AddressBookApp.Data.Repositories
 
         public void UpdateAddress(Address addressModel)
         {
-            var targetEmail = _dbContext.Addresses.SingleOrDefault(x => x.Id == addressModel.Id);
-            targetEmail.Name = addressModel.Name;
-            _dbContext.SaveChanges();
+            _dbContext.Entry(addressModel).State = EntityState.Modified;
+            addressModel.Name = addressModel.Name;            
         }        
     }
 }

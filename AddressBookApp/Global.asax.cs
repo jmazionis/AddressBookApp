@@ -19,7 +19,7 @@ namespace AddressBookApp
             UnityConfig.RegisterTypes(UnityConfig.GetConfiguredContainer());
 
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-            //BundleTable.EnableOptimizations = true;
+            BundleTable.EnableOptimizations = true;
         }
     }
 }

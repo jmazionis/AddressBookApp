@@ -2,19 +2,19 @@
 using AddressBookApp.Data.Context;
 using AddressBookApp.ViewModels;
 using AddressBookApp.Data.Interfaces;
+using AddressBookApp.Data.Infrastructure;
 
 namespace AddressBookApp.Controllers
 {
     public class EmailsController : Controller
     {
-        private readonly IEmailRepository _emailRepository;
+        private readonly IAddressBookUnitOfWork _unitOfWork;
 
-        public EmailsController(IEmailRepository emailRepository)
+        public EmailsController(IAddressBookUnitOfWork unitOfWork)
         {
-            _emailRepository = emailRepository;
+            _unitOfWork = unitOfWork;
         }
-
-        // GET: Addresses/Create
+        
         public ActionResult Create(int id)
         {
             return View(new EmailViewModel
@@ -29,11 +29,12 @@ namespace AddressBookApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _emailRepository.AddNewEmailToContact(new Email
+                _unitOfWork.EmailRepository.AddNewEmailToContact(new Email
                 {
                     PersonId = emailViewModel.PersonId,
                     Name = emailViewModel.Name
                 });
+                _unitOfWork.CommitChanges();
                 TempData["SuccessMessage"] = "New email has been successfully added!";
                 return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
             }          
@@ -42,7 +43,7 @@ namespace AddressBookApp.Controllers
         
         public ActionResult Edit([Bind(Include = "emailId")] int emailId)
         {
-            var emailModel = _emailRepository.GetById(emailId);
+            var emailModel = _unitOfWork.EmailRepository.GetById(emailId);            
             return View(new EmailViewModel
             {
                 Id = emailModel.Id,
@@ -57,13 +58,14 @@ namespace AddressBookApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                _emailRepository.UpdateEmail(
+                _unitOfWork.EmailRepository.UpdateEmail(
                 new Email
                 {
                     Id = emailViewModel.Id,
                     Name = emailViewModel.Name,
                     PersonId = emailViewModel.PersonId
                 });
+                _unitOfWork.CommitChanges();
                 TempData["SuccessMessage"] = "Email has been successfully updated!";
                 return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
             }
@@ -73,7 +75,7 @@ namespace AddressBookApp.Controllers
         // GET: Emails/Delete/5
         public ActionResult Delete(int emailId)
         {
-            var targetEmail = _emailRepository.GetById(emailId);
+            var targetEmail = _unitOfWork.EmailRepository.GetById(emailId);
             return PartialView("Partials/Emails/_DeleteEmailModal", new EmailViewModel
             {
                 Id = targetEmail.Id,
@@ -81,13 +83,13 @@ namespace AddressBookApp.Controllers
                 PersonId = targetEmail.PersonId
             });
         }
-
-        // POST: Emails/Delete/5
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete([Bind(Include = "Id,PersonId,Name")] EmailViewModel emailViewModel)
         {
-            _emailRepository.DeleteEmail(emailViewModel.Id);
+            _unitOfWork.EmailRepository.DeleteEmail(emailViewModel.Id);
+            _unitOfWork.CommitChanges();
             TempData["SuccessMessage"] = "Email has been successfully deleted";
             return RedirectToAction("Edit", "Contacts", new { id = emailViewModel.PersonId });
         }

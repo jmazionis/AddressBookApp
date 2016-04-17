@@ -27,7 +27,28 @@
                                 @Html.EditorFor(model => model.Surname, new { htmlAttributes = new { @class = "form-control" } })
                                 @Html.ValidationMessageFor(model => model.Surname, "", new { @class = "text-danger" })
                             </div>
-                        </div>
+                        </div>       
+                        
+                        @{
+                            if (Model.Emails != null)
+                            {
+                                for (int i = 0; i < Model.Emails.Count; i++)
+                                {
+                                    @Html.HiddenFor(x => Model.Emails[i].Id);
+                                    @Html.HiddenFor(x => Model.Emails[i].PersonId);
+                                    @Html.HiddenFor(x => Model.Emails[i].Name);
+                                }
+                            }
+                            if (Model.Addresses != null)
+                            {
+                                for (int i = 0; i < Model.Addresses.Count; i++)
+                                {
+                                    @Html.HiddenFor(x => Model.Addresses[i].Id);
+                                    @Html.HiddenFor(x => Model.Addresses[i].PersonId);
+                                    @Html.HiddenFor(x => Model.Addresses[i].Name);
+                                }
+                            }
+                        }
 
                         <div class="form-group">
                             <div class="col-md-offset-2 col-md-10">

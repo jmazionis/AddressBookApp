@@ -13,7 +13,7 @@ namespace AddressBookApp.Data.Context
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class AddressBookDbContext : DbContext
+    public partial class AddressBookDbContext : DbContext, IAddressBookDbContext
     {
         public AddressBookDbContext()
             : base("name=AddressBookDbContext")
@@ -27,6 +27,17 @@ namespace AddressBookApp.Data.Context
     
         public virtual DbSet<Address> Addresses { get; set; }
         public virtual DbSet<Email> Emails { get; set; }
-        public virtual DbSet<Person> People { get; set; }        
+        public virtual DbSet<Person> People { get; set; }
     }
+    
+    public interface IAddressBookDbContext
+    {
+        DbSet<Address> Addresses { get; set; }
+        DbSet<Email> Emails { get; set; }
+        DbSet<Person> People { get; set; }
+       
+    	DbEntityEntry Entry(object entity);
+        int SaveChanges(); 
+    }
+    
 }

@@ -4,6 +4,12 @@
     ViewBag.Title = "Create";
 }
 
+@section scripts {
+    @Scripts.Render("~/bundles/jquery_validation")
+}
+
+ 
+
 <h2>Create new email</h2>
 
 @using (Html.BeginForm()) 
@@ -30,5 +36,5 @@
 }
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Back to List", "Edit", "Contacts", new { @id = Model.PersonId }, null)
 </div>

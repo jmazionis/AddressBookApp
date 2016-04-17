@@ -94,7 +94,8 @@
     <Compile Include="Context\Person.cs">
       <DependentUpon>AddressBookDbContext.tt</DependentUpon>
     </Compile>
-    <Compile Include="Infrastructure\IUnitOfWork.cs" />
+    <Compile Include="Infrastructure\Abstract\IAddressBookUnitOfWork.cs" />
+    <Compile Include="Infrastructure\Concrete\AddressBookUnitOfWork.cs" />
     <Compile Include="Interfaces\IAddressRepository.cs" />
     <Compile Include="Interfaces\IEmailRepository.cs" />
     <Compile Include="Interfaces\IPersonRepository.cs" />
@@ -150,6 +151,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

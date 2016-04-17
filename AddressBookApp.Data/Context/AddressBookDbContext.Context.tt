@@ -53,7 +53,7 @@ using System.Linq;
 }
 #>
 
-<#=Accessibility.ForType(container)#> partial class <#=code.Escape(container)#> : DbContext
+<#=Accessibility.ForType(container)#> partial class <#=code.Escape(container)#> : DbContext, I<#=code.Escape(container)#>
 {
     public <#=code.Escape(container)#>()
         : base("name=<#=container.Name#>")
@@ -99,6 +99,20 @@ foreach (var entitySet in container.BaseEntitySets.OfType<EntitySet>())
     }
 #>
 }
+
+public interface IAddressBookDbContext
+{
+<#
+    foreach (var entitySet in container.BaseEntitySets.OfType<EntitySet>())
+    {
+#>
+    DbSet<<#=entitySet.ElementType.Name#>> <#=entitySet#> { get; set; }
+<#
+    }#>   
+	DbEntityEntry Entry(object entity);
+    int SaveChanges(); 
+}
+
 <#
 
 if (!String.IsNullOrEmpty(codeNamespace))

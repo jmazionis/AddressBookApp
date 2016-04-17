@@ -45,7 +45,7 @@
                 "data": null,                
                 "render": function (data, type, row) {
                     return '<a class="glyphicon glyphicon-edit" href=/Contacts/Edit/' + data.Id + '>Edit</a>' +
-                           '<a class="margin-left-25 glyphicon glyphicon-trash" data_toggle="modal" data_target="#modal-container" href=/Contacts/Delete/' + data.Id + '>Delete</a>';
+                           '<a class="glyphicon glyphicon-trash modal-link"  href=/Contacts/Delete/' + data.Id + '>Delete</a>';
                 }
             }
         ],

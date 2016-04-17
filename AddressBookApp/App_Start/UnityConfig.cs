@@ -3,6 +3,9 @@ using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.Configuration;
 using AddressBookApp.Data.Interfaces;
 using AddressBookApp.Data.Repositories;
+using AddressBookApp.Data.Context;
+using AddressBookApp.Data.Infrastructure;
+using AddressBookApp.Data.Infrastructure.Concrete;
 
 namespace AddressBookApp.App_Start
 {
@@ -33,7 +36,9 @@ namespace AddressBookApp.App_Start
         /// <remarks>There is no need to register concrete types such as controllers or API controllers (unless you want to 
         /// change the defaults), as Unity allows resolving a concrete type even if it was not previously registered.</remarks>
         public static void RegisterTypes(IUnityContainer container)
-        {                      
+        {
+            container.RegisterType<IAddressBookDbContext, AddressBookDbContext>(new PerRequestLifetimeManager());
+            container.RegisterType<IAddressBookUnitOfWork, AddressBookUnitOfWork>(new PerRequestLifetimeManager());
             container.RegisterType<IPersonRepository, PersonRepository>();
             container.RegisterType<IEmailRepository, EmailRepository>();
             container.RegisterType<IAddressRepository, AddressRepository>();

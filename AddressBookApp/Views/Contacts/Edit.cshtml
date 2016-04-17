@@ -4,6 +4,10 @@
     ViewBag.Title = "Edit";
 }
 
+@section scripts {
+    @Scripts.Render("~/bundles/jquery_validation")
+}
+
 <h2>Edit</h2>
 
 @using (Html.BeginForm())
